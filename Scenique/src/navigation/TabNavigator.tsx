@@ -40,11 +40,43 @@ const TabNavigator = () => {
             />
           );
         },
+        // tabBarLabelStyle: {
+        //   fontFamily: "CG_Regular",
+        //   marginTop: 5,
+        //   fontSize: 12,
+        // },
+        tabBarLabel: "",
+        tabBarActiveTintColor: "#32BAE8",
+        tabBarInactiveTintColor: "#e0e0e0",
       })}
     >
-      <Tab.Screen name="Dashboard" component={DashboardScreen} />
-      <Tab.Screen name="Likes" component={LikesScreen} />
-      <Tab.Screen name="Profile" component={ProfileScreen} />
+      <Tab.Screen
+        name="Dashboard"
+        component={DashboardScreen}
+        options={{
+          headerTitleStyle: {
+            fontFamily: "CG_Bold",
+            color: "#fff",
+          },
+          headerStyle: { backgroundColor: "#363B40" },
+        }}
+      />
+      <Tab.Screen
+        name="Likes"
+        component={LikesScreen}
+        options={{
+          headerTitleStyle: { fontFamily: "CG_Bold", color: "#fff" },
+          headerStyle: { backgroundColor: "#363B40" },
+        }}
+      />
+      <Tab.Screen
+        name="Profile"
+        component={ProfileScreen}
+        options={{
+          headerTitleStyle: { fontFamily: "CG_Bold", color: "#fff" },
+          headerStyle: { backgroundColor: "#363B40" },
+        }}
+      />
     </Tab.Navigator>
   );
 };
@@ -53,10 +85,11 @@ export default TabNavigator;
 
 const styles = StyleSheet.create({
   tabBar: {
-    backgroundColor: "#fff",
+    backgroundColor: "#363B40",
     height: 60,
   },
   icon: {
-    marginTop: "15%",
+    height: "100%",
+    marginTop: "50%",
   },
 });
