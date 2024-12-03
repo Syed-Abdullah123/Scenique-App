@@ -16,5 +16,10 @@ export default function App() {
     return null;
   }
 
-  return <RootNavigator />;
+  return (
+    <>
+      <RootNavigator />
+      <StatusBar style="light" />
+    </>
+  );
 }
