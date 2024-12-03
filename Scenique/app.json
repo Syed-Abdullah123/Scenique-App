@@ -1,0 +1,29 @@
+{
+  "expo": {
+    "name": "Scenique",
+    "slug": "Scenique",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icons/splash-icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/icons/splash-icon.png",
+      "resizeMode": "cover",
+      "backgroundColor": "#363B40"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icons/icon.png",
+        "backgroundColor": "#363B40"
+      }
+    },
+    "web": {
+      "favicon": "./assets/icons/favicon.png"
+    },
+    "plugins": ["expo-font"]
+  }
+}
