@@ -1,18 +1,10 @@
 import { StyleSheet } from "react-native";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
 import DashboardScreen from "../screens/DashboardScreen";
 import LikesScreen from "../screens/LikesScreen";
-import ProfileScreen from "../screens/ProfileScreen";
-import iconSet from "@expo/vector-icons/build/Fontisto";
-import { View } from "react-native-reanimated/lib/typescript/Animated";
-
-type TabParamList = {
-  Dashboard: undefined;
-  Likes: undefined;
-  Profile: undefined;
-};
+import SearchScreen from "../screens/ProfileScreen";
 
 const TabNavigator = () => {
   const Tab = createBottomTabNavigator();
@@ -24,15 +16,15 @@ const TabNavigator = () => {
           let iconName;
 
           if (route.name === "Dashboard") {
-            iconName = focused ? "view-dashboard" : "view-dashboard-outline";
+            iconName = focused ? "grid" : "grid-outline";
           } else if (route.name === "Likes") {
-            iconName = focused ? "cards-heart" : "cards-heart-outline";
-          } else if (route.name === "Profile") {
-            iconName = focused ? "account" : "account-outline";
+            iconName = focused ? "heart" : "heart-outline";
+          } else if (route.name === "Search") {
+            iconName = focused ? "search" : "search-outline";
           }
 
           return (
-            <MaterialCommunityIcons
+            <Ionicons
               name={iconName}
               size={size}
               color={color}
@@ -70,8 +62,8 @@ const TabNavigator = () => {
         }}
       />
       <Tab.Screen
-        name="Profile"
-        component={ProfileScreen}
+        name="Search"
+        component={SearchScreen}
         options={{
           headerTitleStyle: { fontFamily: "CG_Bold", color: "#fff" },
           headerStyle: { backgroundColor: "#363B40" },
