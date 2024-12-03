@@ -1,110 +1,102 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Pressable,
   StyleSheet,
   Text,
   View,
   Image,
-  Animated,
+  Dimensions,
 } from "react-native";
 import {
-  GestureHandlerRootView,
   PanGestureHandler,
-  State,
+  GestureHandlerRootView,
 } from "react-native-gesture-handler";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+} from "react-native-reanimated";
+
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import ButtonComponent from "../components/ButtonComponent";
+
+const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 const DetailsScreen = ({ navigation, route }: any) => {
   const { item } = route.params;
-  // const [overlayHeight, setOverlayHeight] = useState(new Animated.Value(0.15));
+  const [isClicked, setIsClicked] = useState(false);
 
-  // Use state listeners to update the height animation value when required
-  // const toggleOverlay = () => {
-  //   Animated.timing(overlayHeight, {
-  //     toValue: overlayHeight.__getValue() < 0.5 ? 0.8 : 0.15, // Use __getValue to check the current state
-  //     duration: 300,
-  //     useNativeDriver: false,
-  //   }).start();
+  // const translateY = useSharedValue(SCREEN_HEIGHT * 0.4); // Initially at 40% of screen height
+
+  // const animatedStyle = useAnimatedStyle(() => ({
+  //   transform: [{ translateY: translateY.value }],
+  // }));
+
+  // const onGestureEvent = (event: any) => {
+  //   const newY = translateY.value + event.translationY;
+  //   translateY.value = Math.max(0, Math.min(SCREEN_HEIGHT * 0.4, newY));
   // };
 
-  // const onGestureEvent = Animated.event(
-  //   [{ nativeEvent: { translationY: overlayHeight } }],
-  //   { useNativeDriver: false }
-  // );
-
-  // const onHandlerStateChange = (event: any) => {
-  //   if (event.nativeEvent.state === State.END) {
-  //     const { translationY } = event.nativeEvent;
-  //     if (translationY > 100) {
-  //       // If dragged down more than 100, close the overlay
-  //       Animated.timing(overlayHeight, {
-  //         toValue: 0.15,
-  //         duration: 300,
-  //         useNativeDriver: false,
-  //       }).start();
-  //     } else {
-  //       // Otherwise, open the overlay fully
-  //       Animated.timing(overlayHeight, {
-  //         toValue: 0.8,
-  //         duration: 300,
-  //         useNativeDriver: false,
-  //       }).start();
-  //     }
-  //   }
-  // };
-
-  // const toggleOverlay = () => {
-  //   if (overlayHeight._value < 0.5) {
-  //     Animated.timing(overlayHeight, {
-  //       toValue: 0.8,
-  //       duration: 300,
-  //       useNativeDriver: false,
-  //     }).start();
+  // const onGestureEnd = () => {
+  //   if (translateY.value > SCREEN_HEIGHT * 0.2) {
+  //     translateY.value = withSpring(SCREEN_HEIGHT * 0.4); // Snap down
   //   } else {
-  //     Animated.timing(overlayHeight, {
-  //       toValue: 0.15,
-  //       duration: 300,
-  //       useNativeDriver: false,
-  //     }).start();
+  //     translateY.value = withSpring(0); // Snap up
   //   }
   // };
+
+  // Shared Value for bottom sheet position
+  const translateY = useSharedValue(300); // Initially down
+
+  // Gesture handling
+  const gestureHandler = (event: any) => {
+    translateY.value = withSpring(
+      Math.max(0, Math.min(300, translateY.value + event.translationY))
+    );
+  };
+
+  const gestureEndHandler = () => {
+    if (translateY.value > 150) {
+      translateY.value = withSpring(300); // Snap to bottom
+    } else {
+      translateY.value = withSpring(0); // Snap to top
+    }
+  };
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: translateY.value }],
+  }));
 
   return (
-    // <GestureHandlerRootView style={styles.container}>
     <View style={styles.container}>
       <Pressable style={styles.backIcon} onPress={() => navigation.goBack()}>
-        <MaterialCommunityIcons name="chevron-left" size={24} color="#FF6B6B" />
+        <MaterialCommunityIcons name="chevron-left" size={24} color="#32BAE8" />
       </Pressable>
       <View>
         <Image source={item.image} style={styles.image} />
-        {/* <PanGestureHandler
-          onGestureEvent={onGestureEvent}
-          onHandlerStateChange={onHandlerStateChange}
-        >
-          <Animated.View
-            style={[
-              styles.overlay,
-              {
-                height: overlayHeight.interpolate({
-                  inputRange: [0.15, 0.8],
-                  outputRange: ["15%", "80%"],
-                }),
-              },
-            ]}
-          > */}
-        <View style={styles.overlay}>
-          <Pressable style={styles.line} />
-          <View style={styles.titleContainer}>
+      </View>
+      <View style={styles.overlay}>
+        <Pressable style={styles.line} />
+        <View style={styles.titleContainer}>
+          <View>
             <Text style={styles.title}>{item.title}</Text>
             <Text style={styles.author}>{item.authorName}</Text>
           </View>
-          {/* <Text style={styles.desc}>{item.description}</Text> */}
-          {/* </Animated.View> */}
-          {/* </PanGestureHandler> */}
+          <View style={styles.cont2}>
+            <Pressable onPress={() => setIsClicked(!isClicked)}>
+              {!isClicked ? (
+                <Ionicons name="heart-outline" size={28} color="#e0e0e0" />
+              ) : (
+                <Ionicons name="heart" size={28} color="red" />
+              )}
+            </Pressable>
+            <Pressable onPress={() => console.log("Download pressed.")}>
+              <Ionicons name="download-outline" size={28} color="#e0e0e0" />
+            </Pressable>
+          </View>
         </View>
       </View>
     </View>
-    // {/* </GestureHandlerRootView> */}
   );
 };
 
@@ -138,20 +130,31 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: "rgba(0, 0, 0, 0.4)",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
     paddingVertical: 10,
     paddingHorizontal: 20,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
   },
   line: {
     width: 40,
     borderWidth: 2,
     borderRadius: 20,
-    borderColor: "#FF6B6B",
+    borderColor: "#32BAE8",
     alignSelf: "center",
     marginBottom: 10,
   },
   titleContainer: {
-    marginBottom: 20,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 10,
+    width: "100%",
+  },
+  cont2: {
+    flexDirection: "row",
+    width: 70,
+    gap: 15,
   },
   title: {
     fontFamily: "Lexend_Bold",
