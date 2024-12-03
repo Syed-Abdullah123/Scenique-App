@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -11,6 +11,8 @@ import { wallpapers } from "../data/wallpapers";
 import LoaderAnimation from "../components/CustomLoader";
 
 const DashboardScreen = ({ navigation }) => {
+  const [loading, setLoading] = useState(true);
+
   const renderItem = ({ item }: any) => {
     return (
       <TouchableHighlight
@@ -29,7 +31,13 @@ const DashboardScreen = ({ navigation }) => {
     );
   };
 
-  if (!wallpapers) return <LoaderAnimation />;
+  // if (loading) {
+  //   return (
+  //     <View style={styles.loadingScreen}>
+  //       <LoaderAnimation />
+  //     </View>
+  //   );
+  // }
 
   return (
     <View style={styles.container}>
@@ -83,5 +91,11 @@ const styles = StyleSheet.create({
     fontFamily: "Lexend_Regular",
     fontSize: 12,
     color: "#e0e0e0",
+  },
+  loadingScreen: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#363B40",
   },
 });
