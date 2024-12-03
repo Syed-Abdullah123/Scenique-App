@@ -1,11 +1,11 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
-import LoaderAnimation from "../components/CustomLoader";
+import LikeScreenComponent from "../components/LikeScreenComponent";
 
-const LikesScreen = () => {
+const LikesScreen = ({ navigation }: any) => {
   return (
     <View style={styles.container}>
-      <LoaderAnimation />
+      <LikeScreenComponent navigation={navigation} />
     </View>
   );
 };
@@ -15,8 +15,6 @@ export default LikesScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
     backgroundColor: "#363B40",
   },
   text: {
