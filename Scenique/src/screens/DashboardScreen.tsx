@@ -5,46 +5,87 @@ import {
   View,
   FlatList,
   Image,
-  TouchableHighlight,
+  TouchableOpacity,
+  Pressable,
 } from "react-native";
 import { wallpapers } from "../data/wallpapers";
-import LoaderAnimation from "../components/CustomLoader";
 
 const DashboardScreen = ({ navigation }) => {
-  const [loading, setLoading] = useState(true);
+  const sections = [
+    {
+      title: "Best of the month",
+      data: wallpapers,
+      horizontal: true,
+    },
+    {
+      title: "Categories",
+      data: wallpapers,
+      horizontal: false,
+      numColumns: 2,
+    },
+  ];
 
-  const renderItem = ({ item }: any) => {
+  const renderItem = ({ item, section }: any) => {
     return (
-      <TouchableHighlight
-        style={styles.flatlistContainer}
-        onPress={() => navigation.navigate("Details", { item })}
+      <Pressable
+        style={
+          section.horizontal
+            ? styles.flatlistContainer
+            : styles.categoriesContainer
+        }
+        onPress={() => {
+          section.horizontal
+            ? navigation.navigate("Details", { item })
+            : navigation.navigate("Cat_Details", { item });
+        }}
       >
-        <View>
-          <Image source={item.image} style={styles.image}></Image>
+        <Image
+          source={item.image}
+          style={section.horizontal ? styles.image : styles.categoryImage}
+        ></Image>
+        {!section.horizontal && (
           <View style={styles.overlay}>
             <Text style={styles.title}>{item.title}</Text>
-            {/* <Text style={styles.author}>{item.authorName}</Text> */}
           </View>
-        </View>
-        {/* <Text style={styles.desc}>{item.description}</Text> */}
-      </TouchableHighlight>
+        )}
+      </Pressable>
     );
   };
 
-  // if (loading) {
-  //   return (
-  //     <View style={styles.loadingScreen}>
-  //       <LoaderAnimation />
-  //     </View>
-  //   );
-  // }
+  const renderSectionHeader = ({ section }) => {
+    return (
+      <View style={styles.best}>
+        <Text style={styles.bestTitle}>{section.title}</Text>
+        {section.title === "Categories" && (
+          <TouchableOpacity
+            onPress={() => navigation.navigate("AllCategories")}
+          >
+            <Text style={styles.more}>See More</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+    );
+  };
 
   return (
     <View style={styles.container}>
       <FlatList
-        data={wallpapers}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id.toString()}
+        data={sections}
+        renderItem={({ item: section }) => (
+          <View>
+            {renderSectionHeader({ section })}
+            <FlatList
+              data={section.data}
+              renderItem={({ item }) => renderItem({ item, section })}
+              keyExtractor={(item) => item.id.toString()}
+              horizontal={section.horizontal}
+              showsHorizontalScrollIndicator={false}
+              numColumns={section.numColumns}
+            />
+          </View>
+        )}
+        keyExtractor={(section, index) => index.toString()}
+        showsVerticalScrollIndicator={false}
       />
     </View>
   );
@@ -55,13 +96,46 @@ export default DashboardScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 10,
+    paddingHorizontal: 15,
     backgroundColor: "#363B40",
+    paddingVertical: 10,
   },
   flatlistContainer: {
-    marginVertical: 10,
+    marginBottom: 10,
+    borderRadius: 10,
+    height: 190,
+    width: 150,
+    marginRight: 10,
+  },
+  best: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  bestTitle: {
+    fontFamily: "Lexend_Bold",
+    fontSize: 20,
+    color: "#fff",
+    marginBottom: 10,
+  },
+  more: {
+    fontFamily: "Lexend_Medium",
+    color: "#32BAE8",
+    fontSize: 12,
+    textDecorationLine: "underline",
+  },
+  categoriesContainer: {
+    marginBottom: 10,
     borderRadius: 10,
     overflow: "hidden",
+    height: 85,
+    width: 160,
+    marginRight: 10,
+  },
+  categoryImage: {
+    height: "100%",
+    width: "100%",
+    borderRadius: 15,
   },
   overlay: {
     position: "absolute",
@@ -70,32 +144,17 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     justifyContent: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: "rgba(0,0,0,0.3)",
   },
   title: {
-    fontFamily: "CG_Bold",
-    fontSize: 24,
+    fontFamily: "Lexend_Bold",
+    fontSize: 16,
     color: "#fff",
     textAlign: "center",
   },
   image: {
+    height: "100%",
     width: "100%",
-    height: 120,
-  },
-  author: {
-    fontFamily: "Lexend_Bold",
-    fontSize: 16,
-    color: "#fff",
-  },
-  desc: {
-    fontFamily: "Lexend_Regular",
-    fontSize: 12,
-    color: "#e0e0e0",
-  },
-  loadingScreen: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#363B40",
+    borderRadius: 10,
   },
 });
