@@ -1,5 +1,12 @@
 import React, { useEffect } from "react";
-import { StyleSheet, Text, View, FlatList, Image } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  FlatList,
+  Image,
+  Pressable,
+} from "react-native";
 import { wallpapers } from "../data/wallpapers";
 
 const CategoryDetails = ({ route, navigation }) => {
@@ -21,9 +28,12 @@ const CategoryDetails = ({ route, navigation }) => {
 
   const renderItem = ({ item }) => {
     return (
-      <View style={styles.flatlistContainer}>
+      <Pressable
+        style={styles.flatlistContainer}
+        onPress={() => navigation.navigate("Details", { item })}
+      >
         <Image source={item.image} style={styles.image}></Image>
-      </View>
+      </Pressable>
     );
   };
 
@@ -35,7 +45,7 @@ const CategoryDetails = ({ route, navigation }) => {
         numColumns={3}
         keyExtractor={(item) => item.id.toString()}
         showsVerticalScrollIndicator={false}
-        key="id"
+        key="flatlist-wallpaper-items"
       />
     </View>
   );
