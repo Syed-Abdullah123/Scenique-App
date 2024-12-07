@@ -18,7 +18,7 @@ export default Search;
 
 const styles = StyleSheet.create({
   input: {
-    width: "90%",
+    width: "100%",
     height: 40,
     borderRadius: 5,
     flexDirection: "row",
@@ -28,6 +28,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     alignSelf: "center",
     marginTop: 15,
+    marginBottom: 15,
   },
   inputField: {
     flex: 1,
