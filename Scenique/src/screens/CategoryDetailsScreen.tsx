@@ -6,10 +6,11 @@ import {
   FlatList,
   Image,
   Pressable,
+  Dimensions,
 } from "react-native";
 import { wallpapers } from "../data/wallpapers";
 
-const CategoryDetails = ({ route, navigation }) => {
+const CategoryDetails = ({ route, navigation }: any) => {
   // displaying header with the category name from previous screen
   useEffect(() => {
     navigation.setOptions({
@@ -42,10 +43,13 @@ const CategoryDetails = ({ route, navigation }) => {
       <FlatList
         data={wallpapers}
         renderItem={renderItem}
-        numColumns={3}
+        numColumns={2}
         keyExtractor={(item) => item.id.toString()}
         showsVerticalScrollIndicator={false}
-        key="flatlist-wallpaper-items"
+        columnWrapperStyle={{
+          justifyContent: "space-between",
+        }}
+        key="flatlist-wallpaper"
       />
     </View>
   );
@@ -61,13 +65,13 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   flatlistContainer: {
-    width: "31%",
+    width: "48%",
     marginRight: 10,
     marginBottom: 10,
   },
   image: {
     width: "100%",
-    height: 160,
+    height: 200,
     borderRadius: 10,
   },
 });
