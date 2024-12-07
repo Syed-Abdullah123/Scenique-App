@@ -57,9 +57,7 @@ const DashboardScreen = ({ navigation }) => {
       <View style={styles.best}>
         <Text style={styles.bestTitle}>{section.title}</Text>
         {section.title === "Categories" && (
-          <TouchableOpacity
-            onPress={() => navigation.navigate("AllCategories")}
-          >
+          <TouchableOpacity onPress={() => navigation.navigate("Search")}>
             <Text style={styles.more}>See More</Text>
           </TouchableOpacity>
         )}
@@ -103,8 +101,8 @@ const styles = StyleSheet.create({
   flatlistContainer: {
     marginBottom: 10,
     borderRadius: 10,
-    height: 190,
-    width: 150,
+    height: 180,
+    width: 140,
     marginRight: 10,
   },
   best: {
@@ -143,6 +141,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
+    borderRadius: 15,
     justifyContent: "center",
     backgroundColor: "rgba(0,0,0,0.3)",
   },
