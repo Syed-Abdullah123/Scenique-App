@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, View, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
@@ -32,14 +32,19 @@ const TabNavigator = () => {
             />
           );
         },
-        // tabBarLabelStyle: {
-        //   fontFamily: "CG_Regular",
-        //   marginTop: 5,
-        //   fontSize: 12,
-        // },
         tabBarLabel: "",
         tabBarActiveTintColor: "#32BAE8",
         tabBarInactiveTintColor: "#e0e0e0",
+        tabBarButton: (props) => (
+          <View
+            style={[
+              props.accessibilityState.selected ? styles.activeTab : null,
+              styles.tabButtonContainer,
+            ]}
+          >
+            <Pressable {...props} />
+          </View>
+        ),
       })}
     >
       <Tab.Screen
@@ -67,6 +72,7 @@ const TabNavigator = () => {
         options={{
           headerTitleStyle: { fontFamily: "CG_Bold", color: "#fff" },
           headerStyle: { backgroundColor: "#363B40" },
+          headerTitle: "Explore",
         }}
       />
     </Tab.Navigator>
@@ -79,9 +85,20 @@ const styles = StyleSheet.create({
   tabBar: {
     backgroundColor: "#363B40",
     height: 60,
+    borderTopWidth: 0,
   },
   icon: {
     height: "100%",
-    marginTop: "50%",
+  },
+  activeTab: {
+    backgroundColor: "#4A5057",
+    borderRadius: 20,
+  },
+  tabButtonContainer: {
+    height: 37,
+    marginHorizontal: 5,
+    width: 70,
+    alignSelf: "center",
+    marginTop: "7%",
   },
 });
