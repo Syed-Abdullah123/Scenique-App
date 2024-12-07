@@ -44,14 +44,15 @@ export default LikeScreenComponent;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingVertical: 10,
   },
   itemContainer: {
-    width: "50%",
-    marginRight: 5,
+    width: "48%",
+    marginRight: 10,
     marginBottom: 10,
   },
   image: {
-    width: "97%",
+    width: "100%",
     height: 150,
     borderRadius: 10,
     resizeMode: "cover",
