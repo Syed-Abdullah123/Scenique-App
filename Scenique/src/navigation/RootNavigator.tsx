@@ -11,8 +11,16 @@ const RootNavigator = () => {
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Home" component={TabNavigator} />
-        <Stack.Screen name="Details" component={DetailsScreen} />
-        <Stack.Screen name="Cat_Details" component={CategoryDetails} />
+        <Stack.Screen
+          name="Details"
+          component={DetailsScreen}
+          options={{ animation: "slide_from_right" }}
+        />
+        <Stack.Screen
+          name="Cat_Details"
+          component={CategoryDetails}
+          options={{ animation: "none" }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
