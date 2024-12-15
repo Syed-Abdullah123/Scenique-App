@@ -160,6 +160,7 @@ const Signup = ({ navigation }: any) => {
             title={loading ? <ActivityIndicator color="#fff" /> : "Sign Up"}
             icon={loading ? null : "arrow-forward"}
             onPress={handleSignup}
+            disabled={loading}
           />
           <Text style={styles.signinText}>
             Already have an account?
