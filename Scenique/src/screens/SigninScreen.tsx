@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Image,
   StyleSheet,
@@ -6,13 +6,69 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  Alert,
+  ActivityIndicator,
+  ScrollView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import ButtonComponent from "../components/ButtonComponent";
 
+import { FIREBASE_AUTH } from "../../firebaseConfig";
+import { signInWithEmailAndPassword } from "firebase/auth";
+
 const Signin = ({ navigation }: any) => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSignin = async () => {
+    if (!email.trim() || !email.includes("@")) {
+      Alert.alert("Validation Error", "Please enter a valid email address.");
+      return;
+    }
+    if (!password.trim()) {
+      Alert.alert("Validation Error", "Password is required.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // Sign in user
+      const userCredential = await signInWithEmailAndPassword(
+        FIREBASE_AUTH,
+        email,
+        password
+      );
+
+      const user = userCredential.user;
+
+      // Check if the email is verified
+      if (!user.emailVerified) {
+        Alert.alert(
+          "Email Not Verified",
+          "Please verify your email address before logging in."
+        );
+        setLoading(false);
+        return;
+      }
+
+      // Alert.alert("Login Successful", `Welcome back, ${user.email}!`);
+      navigation.navigate("Home"); // Navigate to home or dashboard
+    } catch (error: any) {
+      let errorMessage = "Something went wrong. Please try again.";
+      if (error.code === "auth/user-not-found") {
+        errorMessage = "No account found with this email.";
+      } else if (error.code === "auth/wrong-password") {
+        errorMessage = "Incorrect password. Please try again.";
+      }
+      Alert.alert("Signin Error", errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <View style={styles.header}>
         <Image
           source={require("../../assets/icons/scenique-logo.png")}
@@ -32,6 +88,8 @@ const Signin = ({ navigation }: any) => {
               style={styles.input}
               placeholder="Enter your email"
               placeholderTextColor="#363B40"
+              value={email}
+              onChangeText={setEmail}
             />
           </View>
           <View style={styles.inputContainer}>
@@ -40,6 +98,9 @@ const Signin = ({ navigation }: any) => {
               style={styles.input}
               placeholder="Enter you password"
               placeholderTextColor="#363B40"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry={true}
             />
           </View>
         </View>
@@ -47,18 +108,20 @@ const Signin = ({ navigation }: any) => {
         {/* Button section */}
         <View style={styles.buttonContainer}>
           <ButtonComponent
-            title="Sign In"
-            icon="arrow-forward"
-            onPress={() => navigation.navigate("Home")}
+            title={loading ? <ActivityIndicator color="#fff" /> : "Signin"}
+            icon={loading ? null : "arrow-forward"}
+            onPress={handleSignin}
+            disabled={loading}
           />
-          <TouchableOpacity
-            onPress={() => console.log("Forgot Password Pressed")}
-          >
-            <Text style={styles.signinText}>Forgot Password?</Text>
-          </TouchableOpacity>
         </View>
+        <TouchableOpacity
+          onPress={() => console.log("Forgot Password Pressed")}
+          style={styles.forgotText}
+        >
+          <Text style={styles.signinText}>Forgot Password?</Text>
+        </TouchableOpacity>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -120,6 +183,10 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     marginTop: 20,
+  },
+  forgotText: {
+    width: 120,
+    alignSelf: "flex-end",
   },
   signinText: {
     fontFamily: "CG_Medium",
