@@ -1,3 +1,4 @@
+import React from "react";
 import { StatusBar } from "expo-status-bar";
 import { useFonts } from "expo-font";
 import RootNavigator from "./src/navigation/RootNavigator";
