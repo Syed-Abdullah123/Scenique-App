@@ -1,18 +1,33 @@
-import { Ionicons } from "@expo/vector-icons";
 import React from "react";
+import { Ionicons } from "@expo/vector-icons";
 import { StyleSheet, Text, Pressable } from "react-native";
 
 type ButtonProps = {
-  title: string;
+  title: string | React.ReactNode;
   onPress: () => void;
-  icon: any;
+  icon?: string | null;
+  disabled?: boolean;
 };
 
-const ButtonComponent: React.FC<ButtonProps> = ({ title, onPress, icon }) => {
+const ButtonComponent: React.FC<ButtonProps> = ({
+  title,
+  onPress,
+  icon,
+  disabled,
+}) => {
   return (
-    <Pressable style={styles.button} onPress={onPress}>
+    <Pressable
+      style={[
+        styles.button,
+        disabled && styles.disabledButton, // Add style for disabled state
+      ]}
+      onPress={onPress}
+      disabled={disabled}
+    >
       <Text style={styles.buttonText}>{title}</Text>
-      <Ionicons name={icon} size={24} color="#363B40" style={{ top: 1 }} />
+      {icon && (
+        <Ionicons name={icon} size={24} color="#363B40" style={{ top: 1 }} />
+      )}
     </Pressable>
   );
 };
@@ -33,5 +48,8 @@ const styles = StyleSheet.create({
     color: "#363B40",
     fontSize: 16,
     fontFamily: "CG_Medium",
+  },
+  disabledButton: {
+    backgroundColor: "#32BAE8",
   },
 });
