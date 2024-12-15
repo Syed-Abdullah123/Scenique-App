@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Image,
   StyleSheet,
@@ -6,13 +6,96 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  Alert,
+  ScrollView,
+  ActivityIndicator,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import ButtonComponent from "../components/ButtonComponent";
 
+import { FIREBASE_AUTH, FIREBASE_DB } from "../../firebaseConfig";
+import { doc, setDoc } from "firebase/firestore";
+import {
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+} from "firebase/auth";
+
 const Signup = ({ navigation }: any) => {
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  // Function to handle signup
+  const handleSignup = async () => {
+    // Validate inputs
+    if (!username.trim()) {
+      Alert.alert("Validation Error", "Username is required.");
+      return;
+    }
+    if (!email.trim() || !email.includes("@")) {
+      Alert.alert("Validation Error", "Please enter a valid email address.");
+      return;
+    }
+    if (password.length < 6) {
+      Alert.alert(
+        "Validation Error",
+        "Password must be at least 6 characters long."
+      );
+      return;
+    }
+    if (password !== confirmPassword) {
+      Alert.alert("Validation Error", "Passwords do not match.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // Create user with Firebase
+      const userCredential = await createUserWithEmailAndPassword(
+        FIREBASE_AUTH,
+        email,
+        password
+      );
+
+      // Send email verification
+      const user = userCredential.user;
+      await sendEmailVerification(user);
+
+      // Optional: Save additional user data to Firestore
+      // Add user to Firestore database with username
+      await setDoc(doc(FIREBASE_DB, "users", user.uid), {
+        username: username.trim(),
+        email: email.trim(),
+        createdAt: new Date().toISOString(),
+      });
+
+      Alert.alert(
+        "Signup Successful",
+        "A verification email has been sent to your email address. Please verify your email to log in."
+      );
+
+      // Alert.alert("Signup Successful", `Welcome, ${username}!`);
+      navigation.navigate("Signin"); // Navigate to Signin screen after successful signup
+    } catch (error: any) {
+      // Handle common Firebase auth errors
+      let errorMessage = "Something went wrong. Please try again.";
+      if (error.code === "auth/email-already-in-use") {
+        errorMessage = "This email is already registered.";
+      } else if (error.code === "auth/invalid-email") {
+        errorMessage = "The email address is invalid.";
+      } else if (error.code === "auth/weak-password") {
+        errorMessage = "The password is too weak.";
+      }
+      Alert.alert("Signup Error", errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <View style={styles.header}>
         <Image
           source={require("../../assets/icons/scenique-logo.png")}
@@ -33,6 +116,8 @@ const Signup = ({ navigation }: any) => {
               style={styles.input}
               placeholder="Enter username"
               placeholderTextColor="#363B40"
+              value={username}
+              onChangeText={setUsername}
             />
           </View>
           <View style={styles.inputContainer}>
@@ -41,6 +126,8 @@ const Signup = ({ navigation }: any) => {
               style={styles.input}
               placeholder="Enter your email"
               placeholderTextColor="#363B40"
+              value={email}
+              onChangeText={setEmail}
             />
           </View>
           <View style={styles.inputContainer}>
@@ -49,6 +136,9 @@ const Signup = ({ navigation }: any) => {
               style={styles.input}
               placeholder="Enter you password"
               placeholderTextColor="#363B40"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry={true}
             />
           </View>
           <View style={styles.inputContainer}>
@@ -57,6 +147,9 @@ const Signup = ({ navigation }: any) => {
               style={styles.input}
               placeholder="Confirm password"
               placeholderTextColor="#363B40"
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              secureTextEntry={true}
             />
           </View>
         </View>
@@ -64,9 +157,9 @@ const Signup = ({ navigation }: any) => {
         {/* Button section */}
         <View style={styles.buttonContainer}>
           <ButtonComponent
-            title="Sign Up"
-            icon="arrow-forward"
-            onPress={() => navigation.navigate("Signin")}
+            title={loading ? <ActivityIndicator color="#fff" /> : "Sign Up"}
+            icon={loading ? null : "arrow-forward"}
+            onPress={handleSignup}
           />
           <Text style={styles.signinText}>
             Already have an account?
@@ -78,7 +171,7 @@ const Signup = ({ navigation }: any) => {
           </Text>
         </View>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
