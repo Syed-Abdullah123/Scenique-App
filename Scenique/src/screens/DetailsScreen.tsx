@@ -6,66 +6,13 @@ import {
   View,
   Image,
   Dimensions,
+  Linking,
 } from "react-native";
-import {
-  PanGestureHandler,
-  GestureHandlerRootView,
-} from "react-native-gesture-handler";
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withSpring,
-} from "react-native-reanimated";
-
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import ButtonComponent from "../components/ButtonComponent";
-
-const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 const DetailsScreen = ({ navigation, route }: any) => {
   const { item } = route.params;
   const [isClicked, setIsClicked] = useState(false);
-
-  // const translateY = useSharedValue(SCREEN_HEIGHT * 0.4); // Initially at 40% of screen height
-
-  // const animatedStyle = useAnimatedStyle(() => ({
-  //   transform: [{ translateY: translateY.value }],
-  // }));
-
-  // const onGestureEvent = (event: any) => {
-  //   const newY = translateY.value + event.translationY;
-  //   translateY.value = Math.max(0, Math.min(SCREEN_HEIGHT * 0.4, newY));
-  // };
-
-  // const onGestureEnd = () => {
-  //   if (translateY.value > SCREEN_HEIGHT * 0.2) {
-  //     translateY.value = withSpring(SCREEN_HEIGHT * 0.4); // Snap down
-  //   } else {
-  //     translateY.value = withSpring(0); // Snap up
-  //   }
-  // };
-
-  // Shared Value for bottom sheet position
-  const translateY = useSharedValue(300); // Initially down
-
-  // Gesture handling
-  const gestureHandler = (event: any) => {
-    translateY.value = withSpring(
-      Math.max(0, Math.min(300, translateY.value + event.translationY))
-    );
-  };
-
-  const gestureEndHandler = () => {
-    if (translateY.value > 150) {
-      translateY.value = withSpring(300); // Snap to bottom
-    } else {
-      translateY.value = withSpring(0); // Snap to top
-    }
-  };
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: translateY.value }],
-  }));
 
   return (
     <View style={styles.container}>
@@ -73,14 +20,24 @@ const DetailsScreen = ({ navigation, route }: any) => {
         <MaterialCommunityIcons name="chevron-left" size={24} color="#32BAE8" />
       </Pressable>
       <View>
-        <Image source={item.image} style={styles.image} />
+        <Image
+          source={{ uri: item.urls.regular }}
+          style={styles.image}
+          defaultSource={require("../../assets/icons/icon.png")}
+        />
       </View>
       <View style={styles.overlay}>
         <Pressable style={styles.line} />
         <View style={styles.titleContainer}>
-          <View>
-            <Text style={styles.title}>{item.title}</Text>
-            <Text style={styles.author}>{item.authorName}</Text>
+          <View style={styles.cont1}>
+            <Text style={styles.title}>{item.alt_description}</Text>
+            <Pressable
+              onPress={() =>
+                Linking.openURL(`https://unsplash.com/@${item.user.username}`)
+              }
+            >
+              <Text style={styles.author}>@{item.user.username}</Text>
+            </Pressable>
           </View>
           <View style={styles.cont2}>
             <Pressable onPress={() => setIsClicked(!isClicked)}>
@@ -151,20 +108,27 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     width: "100%",
   },
+  cont1: {
+    width: "70%",
+    gap: 5,
+  },
   cont2: {
     flexDirection: "row",
+    alignItems: "center",
     width: 70,
     gap: 15,
   },
   title: {
     fontFamily: "Lexend_Bold",
-    fontSize: 24,
+    fontSize: 16,
     color: "#fff",
+    flexShrink: 1,
   },
   author: {
     fontFamily: "Lexend_Medium",
-    fontSize: 16,
-    color: "#fff",
+    fontSize: 12,
+    color: "#32BAE8",
+    textDecorationLine: "underline",
   },
   desc: {
     fontFamily: "Lexend_Regular",
