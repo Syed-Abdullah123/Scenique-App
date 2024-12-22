@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -7,49 +7,84 @@ import {
   Image,
   TouchableOpacity,
   Pressable,
+  ActivityIndicator,
 } from "react-native";
-import { wallpapers } from "../data/wallpapers";
+import { UnsplashPhoto, fetchRandomWallpapers } from "../api/unsplash";
+import { WALLPAPER_CATEGORIES, useCategories } from "../data/categories";
 
 const DashboardScreen = ({ navigation }) => {
+  const [bestOfMonth, setBestOfMonth] = useState<UnsplashPhoto[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Get first 6 categories for dashboard
+  const dashboardCategories = WALLPAPER_CATEGORIES.slice(0, 6);
+  const { categories } = useCategories(dashboardCategories);
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        const randomWallpapers = await fetchRandomWallpapers(10);
+        setBestOfMonth(randomWallpapers);
+      } catch (err) {
+        setError("Failed to load wallpapers. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
+
   const sections = [
     {
       title: "Best of the month",
-      data: wallpapers,
+      data: bestOfMonth,
       horizontal: true,
     },
     {
       title: "Categories",
-      data: wallpapers,
+      data: categories,
       horizontal: false,
       numColumns: 2,
     },
   ];
 
   const renderItem = ({ item, section }: any) => {
-    return (
-      <Pressable
-        style={
-          section.horizontal
-            ? styles.flatlistContainer
-            : styles.categoriesContainer
-        }
-        onPress={() => {
-          section.horizontal
-            ? navigation.navigate("Details", { item })
-            : navigation.navigate("Cat_Details", { item });
-        }}
-      >
-        <Image
-          source={item.image}
-          style={section.horizontal ? styles.image : styles.categoryImage}
-        ></Image>
-        {!section.horizontal && (
+    if (section.horizontal) {
+      // Best of month section
+      return (
+        <Pressable
+          style={styles.flatlistContainer}
+          onPress={() => navigation.navigate("Details", { item })}
+        >
+          <Image source={{ uri: item.urls.regular }} style={styles.image} />
+        </Pressable>
+      );
+    } else {
+      // Categories section
+      return (
+        <Pressable
+          style={styles.categoriesContainer}
+          onPress={() =>
+            navigation.navigate("Cat_Details", {
+              category: item,
+              title: item.title,
+            })
+          }
+        >
+          <Image
+            source={{ uri: item.coverImage }}
+            style={styles.categoryImage}
+            defaultSource={require("../../assets/icons/icon.png")}
+          />
           <View style={styles.overlay}>
             <Text style={styles.title}>{item.title}</Text>
           </View>
-        )}
-      </Pressable>
-    );
+        </Pressable>
+      );
+    }
   };
 
   const renderSectionHeader = ({ section }) => {
@@ -65,6 +100,25 @@ const DashboardScreen = ({ navigation }) => {
     );
   };
 
+  if (loading) {
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" color="#fff" />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.centered}>
+        <Text style={styles.error}>{error}</Text>
+        <TouchableOpacity onPress={() => setError(null)}>
+          <Text style={styles.retry}>Retry</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <FlatList
@@ -75,7 +129,7 @@ const DashboardScreen = ({ navigation }) => {
             <FlatList
               data={section.data}
               renderItem={({ item }) => renderItem({ item, section })}
-              keyExtractor={(item) => item.id.toString()}
+              keyExtractor={(item) => item.id}
               horizontal={section.horizontal}
               showsHorizontalScrollIndicator={false}
               numColumns={section.numColumns}
@@ -155,5 +209,23 @@ const styles = StyleSheet.create({
     height: "100%",
     width: "100%",
     borderRadius: 10,
+  },
+  centered: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#363B40",
+  },
+  error: {
+    fontFamily: "Lexend_Bold",
+    fontSize: 20,
+    color: "#fff",
+    marginBottom: 10,
+  },
+  retry: {
+    fontFamily: "Lexend_Medium",
+    color: "#32BAE8",
+    fontSize: 12,
+    textDecorationLine: "underline",
   },
 });
