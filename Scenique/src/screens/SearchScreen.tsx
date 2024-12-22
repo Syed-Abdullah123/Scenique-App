@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -6,19 +6,41 @@ import {
   Image,
   FlatList,
   Pressable,
+  ActivityIndicator,
 } from "react-native";
-import { wallpapers } from "../data/wallpapers";
+import {
+  WALLPAPER_CATEGORIES,
+  Category,
+  useCategories,
+} from "../data/categories";
 import Search from "../components/SearhComponent";
 
 const SearchScreen = ({ navigation }: any) => {
-  const renderItem = ({ item }: any) => {
+  const { categories, loading, error } = useCategories(WALLPAPER_CATEGORIES);
+
+  const renderItem = ({ item }: { item: Category }) => {
     return (
       <Pressable
         style={styles.flatlistContainer}
-        onPress={() => navigation.navigate("Cat_Details", { item })}
+        onPress={() =>
+          navigation.navigate("Cat_Details", {
+            category: item,
+            title: item.title,
+          })
+        }
       >
         <View>
-          <Image source={item.image} style={styles.image}></Image>
+          {item.coverImage ? (
+            <Image
+              source={{ uri: item.coverImage }}
+              style={styles.image}
+              defaultSource={require("../../assets/icons/icon.png")} // Add a placeholder image
+            />
+          ) : (
+            <View style={[styles.image, styles.placeholder]}>
+              <ActivityIndicator />
+            </View>
+          )}
           <View style={styles.overlay}>
             <Text style={styles.title}>{item.title}</Text>
           </View>
@@ -27,15 +49,32 @@ const SearchScreen = ({ navigation }: any) => {
     );
   };
 
+  if (loading) {
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" color="#fff" />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.centered}>
+        <Text style={styles.error}>{error}</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <Search />
       <FlatList
-        data={wallpapers}
+        data={categories}
         renderItem={renderItem}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item) => item.id}
         numColumns={2}
         columnWrapperStyle={{ justifyContent: "space-between" }}
+        showsVerticalScrollIndicator={false}
         key={"Search wallpapers"}
       />
     </View>
@@ -78,5 +117,24 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#fff",
     textAlign: "center",
+  },
+  // gridContainer: {
+  //   padding: 16,
+  //   gap: 16,
+  // },
+  placeholder: {
+    backgroundColor: "#e0e0e0",
+  },
+  centered: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#363B40",
+  },
+  error: {
+    fontFamily: "CG_Regular",
+    color: "#fff",
+    fontSize: 16,
+    marginTop: 10,
   },
 });
