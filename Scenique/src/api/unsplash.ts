@@ -31,7 +31,7 @@ interface FetchOptions {
 export const fetchWallpapers = async ({
   query,
   page = 1,
-  perPage = 10,
+  perPage = 5,
   orderBy = "relevant",
 }: FetchOptions): Promise<UnsplashPhoto[]> => {
   try {
@@ -46,7 +46,13 @@ export const fetchWallpapers = async ({
         Authorization: `Client-ID ${UNSPLASH_ACCESS_KEY}`,
       },
     });
-    return response.data.results;
+    return response.data.results.map((photo) => ({
+      ...photo,
+      urls: {
+        ...photo.urls,
+        regular: photo.urls.small, // Use smaller images for faster load
+      },
+    }));
   } catch (error) {
     console.error("Error fetching wallpapers:", error);
     throw error; // Let the component handle the error
