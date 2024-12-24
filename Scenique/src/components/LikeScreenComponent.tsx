@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext, useState } from "react";
 import {
   FlatList,
   StyleSheet,
@@ -7,9 +7,11 @@ import {
   Image,
   Pressable,
 } from "react-native";
-import { wallpapers } from "../data/wallpapers";
+import { LikedImagesContext } from "../context/LikedImagesContext";
 
 const LikeScreenComponent = ({ navigation }: any) => {
+  const { likedImages } = useContext(LikedImagesContext);
+
   const handlePress = (image: any) => {
     navigation.navigate("Details", { item: image });
   };
@@ -17,24 +19,30 @@ const LikeScreenComponent = ({ navigation }: any) => {
   const renderItem = ({ item }: any) => {
     return (
       <Pressable style={styles.itemContainer} onPress={() => handlePress(item)}>
-        <Image source={item.image} style={styles.image}></Image>
-        {/* <Text>{item.title}</Text> */}
+        <Image source={{ uri: item.urls.thumb }} style={styles.image} />
+        <View style={styles.overlay}>
+          <Text style={styles.username}>By {item.user.name}</Text>
+          <Text style={styles.username}>unsplash.com/{item.user.username}</Text>
+        </View>
       </Pressable>
     );
   };
 
   return (
     <View style={styles.container}>
-      <FlatList
-        data={wallpapers}
-        renderItem={renderItem}
-        contentContainerStyle={{
-          paddingHorizontal: 10,
-        }}
-        numColumns={2}
-        keyExtractor={(item) => item.id.toString()}
-        showsVerticalScrollIndicator={false}
-      />
+      {likedImages.length === 0 ? (
+        <Text style={styles.emptyText}>
+          No wallpapers liked yet. Start liking wallpapers to see them here!
+        </Text>
+      ) : (
+        <FlatList
+          data={likedImages}
+          renderItem={renderItem}
+          numColumns={2}
+          keyExtractor={(item) => item.id.toString()}
+          showsVerticalScrollIndicator={false}
+        />
+      )}
     </View>
   );
 };
@@ -56,5 +64,29 @@ const styles = StyleSheet.create({
     height: 150,
     borderRadius: 10,
     resizeMode: "cover",
+  },
+  emptyText: {
+    fontFamily: "CG_Regular",
+    color: "#fff",
+    fontSize: 16,
+    textAlign: "center",
+    marginTop: 20,
+  },
+  overlay: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
+    justifyContent: "flex-end",
+    alignItems: "flex-start",
+    padding: 10,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  username: {
+    fontFamily: "CG_Regular",
+    color: "#fff",
+    fontSize: 12,
   },
 });
