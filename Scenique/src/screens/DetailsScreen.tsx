@@ -1,18 +1,29 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   Pressable,
   StyleSheet,
   Text,
   View,
   Image,
-  Dimensions,
   Linking,
+  ActivityIndicator,
 } from "react-native";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { LikedImagesContext } from "../context/LikedImagesContext";
 
 const DetailsScreen = ({ navigation, route }: any) => {
   const { item } = route.params;
-  const [isClicked, setIsClicked] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const { likedImages, toggleLike } = useContext(LikedImagesContext);
+  const isLiked = likedImages.some((img) => img.id === item.id); // Check if image is liked
+
+  const handleToggleLike = async () => {
+    if (!loading) {
+      setLoading(true); // Start loading
+      await toggleLike(item); // Wait for the toggleLike action to complete
+      setLoading(false); // Stop loading
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -39,12 +50,16 @@ const DetailsScreen = ({ navigation, route }: any) => {
               <Text style={styles.author}>@{item.user.username}</Text>
             </Pressable>
           </View>
-          <View style={styles.cont2}>
-            <Pressable onPress={() => setIsClicked(!isClicked)}>
-              {!isClicked ? (
-                <Ionicons name="heart-outline" size={28} color="#e0e0e0" />
+          <View style={styles.iconsContainer}>
+            <Pressable onPress={handleToggleLike} disabled={loading}>
+              {loading ? (
+                <ActivityIndicator size="small" color="#32BAE8" />
               ) : (
-                <Ionicons name="heart" size={28} color="red" />
+                <Ionicons
+                  name={isLiked ? "heart" : "heart-outline"}
+                  size={28}
+                  color={isLiked ? "red" : "#e0e0e0"}
+                />
               )}
             </Pressable>
             <Pressable onPress={() => console.log("Download pressed.")}>
@@ -112,7 +127,7 @@ const styles = StyleSheet.create({
     width: "70%",
     gap: 5,
   },
-  cont2: {
+  iconsContainer: {
     flexDirection: "row",
     alignItems: "center",
     width: 70,
