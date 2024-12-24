@@ -2,6 +2,7 @@ import React from "react";
 import { StatusBar } from "expo-status-bar";
 import { useFonts } from "expo-font";
 import RootNavigator from "./src/navigation/RootNavigator";
+import { LikedImagesProvider } from "./src/context/LikedImagesContext";
 
 export default function App() {
   const [loaded] = useFonts({
@@ -19,8 +20,10 @@ export default function App() {
 
   return (
     <>
-      <RootNavigator />
-      <StatusBar style="light" />
+      <LikedImagesProvider>
+        <RootNavigator />
+        <StatusBar style="light" />
+      </LikedImagesProvider>
     </>
   );
 }
