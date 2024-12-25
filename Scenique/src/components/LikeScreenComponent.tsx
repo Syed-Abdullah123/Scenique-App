@@ -22,7 +22,14 @@ const LikeScreenComponent = ({ navigation }: any) => {
         <Image source={{ uri: item.urls.thumb }} style={styles.image} />
         <View style={styles.overlay}>
           <Text style={styles.username}>By {item.user.name}</Text>
-          <Text style={styles.username}>unsplash.com/{item.user.username}</Text>
+          <Text
+            style={[
+              styles.username,
+              { color: "#32BAE8", textDecorationLine: "underline" },
+            ]}
+          >
+            unsplash.com/{item.user.username}
+          </Text>
         </View>
       </Pressable>
     );
