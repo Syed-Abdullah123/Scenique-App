@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { UnsplashPhoto, fetchRandomWallpapers } from "../api/unsplash";
 import { WALLPAPER_CATEGORIES, useCategories } from "../data/categories";
+import Search from "../components/SearhComponent";
 
 const DashboardScreen = ({ navigation }) => {
   const [bestOfMonth, setBestOfMonth] = useState<UnsplashPhoto[]>([]);
@@ -121,6 +122,7 @@ const DashboardScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      <Search />
       <FlatList
         data={sections}
         renderItem={({ item: section }) => (
@@ -150,7 +152,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 15,
     backgroundColor: "#363B40",
-    paddingVertical: 10,
+    // paddingVertical: 10,
   },
   flatlistContainer: {
     marginBottom: 10,
