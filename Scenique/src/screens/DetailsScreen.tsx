@@ -7,13 +7,19 @@ import {
   Image,
   Linking,
   ActivityIndicator,
+  ToastAndroid,
+  Platform,
 } from "react-native";
+import * as FileSystem from "expo-file-system";
+import * as MediaLibrary from "expo-media-library";
+import Toast from "react-native-toast-message";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { LikedImagesContext } from "../context/LikedImagesContext";
 
 const DetailsScreen = ({ navigation, route }: any) => {
   const { item } = route.params;
   const [loading, setLoading] = useState(false);
+  const [downloading, setDownloading] = useState(false);
   const { likedImages, toggleLike } = useContext(LikedImagesContext);
   const isLiked = likedImages.some((img) => img.id === item.id); // Check if image is liked
 
@@ -22,6 +28,135 @@ const DetailsScreen = ({ navigation, route }: any) => {
       setLoading(true); // Start loading
       await toggleLike(item); // Wait for the toggleLike action to complete
       setLoading(false); // Stop loading
+    }
+  };
+
+  // Handle download functionality
+  // const handleDownload = async () => {
+  //   setDownloading(true);
+  //   try {
+  //     // Request permissions
+  //     const { granted } = await MediaLibrary.requestPermissionsAsync();
+  //     if (!granted) {
+  //       throw new Error("Permission to access media library is required.");
+  //     }
+
+  //     // Download the file
+  //     const fileUri = `${FileSystem.documentDirectory}${item.id}.jpg`;
+  //     const { uri } = await FileSystem.downloadAsync(
+  //       item.urls.regular,
+  //       fileUri
+  //     );
+
+  //     // Save to the media library
+  //     const asset = await MediaLibrary.createAssetAsync(uri);
+  //     await MediaLibrary.createAlbumAsync("Wallpapers", asset, false);
+
+  //     // Notify the user
+  //     if (Platform.OS === "android") {
+  //       ToastAndroid.show(
+  //         "Wallpaper downloaded successfully!",
+  //         ToastAndroid.SHORT
+  //       );
+  //     } else {
+  //       alert("Wallpaper downloaded successfully!");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error downloading wallpaper:", error);
+  //     if (Platform.OS === "android") {
+  //       ToastAndroid.show("Failed to download wallpaper.", ToastAndroid.SHORT);
+  //     } else {
+  //       alert("Failed to download wallpaper.");
+  //     }
+  //   } finally {
+  //     setDownloading(false);
+  //   }
+  // };
+
+  const handleDownload = async () => {
+    setDownloading(true);
+    try {
+      const uri = item.urls.full; // Use full-resolution image for download
+      const fileUri = `${FileSystem.cacheDirectory}${item.id}.jpg`; // Save to cache first
+      const downloadResumable = FileSystem.createDownloadResumable(
+        uri,
+        fileUri
+      );
+
+      const { uri: downloadedUri } = await downloadResumable.downloadAsync();
+
+      // Request media library permissions
+      const { status } = await MediaLibrary.requestPermissionsAsync();
+      if (status !== "granted") {
+        Toast.show({
+          type: "error",
+          text1: "Permission Denied",
+          text2: "Media library access is required to save the wallpaper.",
+          visibilityTime: 4000,
+          autoHide: true,
+          position: "top",
+          topOffset: 50,
+          text1Style: {
+            fontFamily: "CG_Bold",
+            fontSize: 14,
+            color: "#000",
+          },
+          text2Style: {
+            fontFamily: "CG_Regular",
+            fontSize: 14,
+            color: "#aaa",
+          },
+        });
+        return;
+      }
+
+      // Save to media library
+      const asset = await MediaLibrary.createAssetAsync(downloadedUri);
+      await MediaLibrary.createAlbumAsync("Scenique Images", asset, false);
+
+      Toast.show({
+        type: "success",
+        text1: "🎉 Wallpaper Downloaded!",
+        text2: "Your wallpaper is saved to your gallery.",
+        visibilityTime: 5000,
+        autoHide: true,
+        position: "top",
+        bottomOffset: 30,
+        text1Style: {
+          fontFamily: "CG_Bold",
+          fontSize: 14,
+          color: "#000",
+        },
+        text2Style: {
+          fontFamily: "CG_Regular",
+          fontSize: 14,
+          color: "#aaa",
+        },
+      });
+    } catch (error) {
+      Toast.show({
+        type: "error",
+        text1: "😞 Download Failed",
+        text2: "An error occurred. Please try again.",
+        visibilityTime: 5000,
+        autoHide: true,
+        position: "top",
+        bottomOffset: 30,
+        text1Style: {
+          fontFamily: "CG_Bold",
+          fontSize: 14,
+          color: "#000",
+        },
+        text2Style: {
+          fontFamily: "CG_Regular",
+          fontSize: 14,
+          color: "#aaa",
+        },
+      });
+
+      console.error("Error downloading image:", error);
+    } finally {
+      setDownloading(false);
     }
   };
 
@@ -62,8 +197,12 @@ const DetailsScreen = ({ navigation, route }: any) => {
                 />
               )}
             </Pressable>
-            <Pressable onPress={() => console.log("Download pressed.")}>
-              <Ionicons name="download-outline" size={28} color="#e0e0e0" />
+            <Pressable onPress={handleDownload} disabled={downloading}>
+              {downloading ? (
+                <ActivityIndicator size="small" color="#32BAE8" />
+              ) : (
+                <Ionicons name="download-outline" size={28} color="#e0e0e0" />
+              )}
             </Pressable>
           </View>
         </View>
