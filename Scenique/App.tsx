@@ -2,6 +2,7 @@ import React from "react";
 import { StatusBar } from "expo-status-bar";
 import { useFonts } from "expo-font";
 import RootNavigator from "./src/navigation/RootNavigator";
+import Toast from "react-native-toast-message";
 import { LikedImagesProvider } from "./src/context/LikedImagesContext";
 
 export default function App() {
@@ -22,6 +23,7 @@ export default function App() {
     <>
       <LikedImagesProvider>
         <RootNavigator />
+        <Toast />
         <StatusBar style="light" />
       </LikedImagesProvider>
     </>
