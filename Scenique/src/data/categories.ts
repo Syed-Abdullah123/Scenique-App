@@ -20,6 +20,18 @@ export const WALLPAPER_CATEGORIES: Category[] = [
   { id: "10", title: "Dark", query: "dark aesthetic" },
   { id: "11", title: "Neon", query: "neon city" },
   { id: "12", title: "Ocean", query: "ocean waves" },
+  { id: "13", title: "Mountains", query: "mountains peaks landscape" },
+  { id: "14", title: "Cities", query: "cityscape urban architecture" },
+  { id: "15", title: "Flowers", query: "flowers botanical nature" },
+  { id: "16", title: "Fantasy", query: "fantasy magical mystical" },
+  { id: "17", title: "Patterns", query: "geometric patterns abstract" },
+  { id: "18", title: "Anime", query: "anime aesthetic art" },
+  { id: "19", title: "Food", query: "food cuisine culinary" },
+  { id: "20", title: "Sports", query: "sports action athletic" },
+  { id: "21", title: "Vintage", query: "vintage retro classic" },
+  { id: "22", title: "Cyberpunk", query: "cyberpunk futuristic neon" },
+  { id: "23", title: "Sunset", query: "sunset golden hour nature" },
+  { id: "24", title: "Waterfall", query: "waterfall nature scenic" },
 ];
 
 import { useState, useEffect } from "react";
