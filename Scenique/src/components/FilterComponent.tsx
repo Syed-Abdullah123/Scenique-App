@@ -1,5 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Modal, StyleSheet, Pressable } from "react-native";
+import {
+  View,
+  Text,
+  Modal,
+  StyleSheet,
+  Pressable,
+  TouchableOpacity,
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { Chip } from "react-native-paper";
 
 const Filter = ({ visible, onClose, onApply, initialValues }) => {
@@ -24,24 +32,29 @@ const Filter = ({ visible, onClose, onApply, initialValues }) => {
         styles.chip,
         selectedOrientation === option && styles.selectedChip,
       ]}
-      textStyle={[
-        styles.chipText,
-        selectedOrientation === option && styles.selectedChipText,
-      ]}
     >
-      <Ionicons
-        name={
-          option === "portrait"
-            ? "phone-portrait-outline"
-            : option === "landscape"
-            ? "phone-landscape-outline"
-            : "albums-outline"
-        }
-        size={16}
-        color={selectedOrientation === option ? "#fff" : "#4CAF50"}
-        style={styles.chipIcon}
-      />
-      {option.charAt(0).toUpperCase() + option.slice(1)}
+      <View style={styles.chipContent}>
+        <Ionicons
+          name={
+            option === "portrait"
+              ? "phone-portrait-outline"
+              : option === "landscape"
+              ? "phone-landscape-outline"
+              : "albums-outline"
+          }
+          size={16}
+          color={selectedOrientation === option ? "#fff" : "#aaa"}
+          style={styles.chipIcon}
+        />
+        <Text
+          style={[
+            styles.chipText,
+            selectedOrientation === option && styles.selectedChipText,
+          ]}
+        >
+          {option.charAt(0).toUpperCase() + option.slice(1)}
+        </Text>
+      </View>
     </Chip>
   );
 
@@ -54,33 +67,27 @@ const Filter = ({ visible, onClose, onApply, initialValues }) => {
     >
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>Filter Options</Text>
+          <View style={styles.modalHeader}>
+            <Text style={styles.modalTitle}>Filter Options</Text>
+            <TouchableOpacity onPress={onClose}>
+              <Ionicons name="close" size={24} color="#fff" />
+            </TouchableOpacity>
+          </View>
 
-          {/* Orientation Options */}
-          <View style={styles.chipsContainer}>
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Orientation</Text>
+            {/* Chips container */}
             {["all", "portrait", "landscape"].map((option) => (
-              <Chip
-                key={option}
-                mode="outlined"
-                selected={selectedOrientation === option}
-                onPress={() => setSelectedOrientation(option)}
-                style={[
-                  styles.chip,
-                  selectedOrientation === option && styles.selectedChip,
-                ]}
-              >
-                {option.charAt(0).toUpperCase() + option.slice(1)}
-              </Chip>
+              <OrientationOption key={option} option={option} />
             ))}
           </View>
 
-          {/* Buttons */}
           <View style={styles.buttonContainer}>
             <Pressable style={styles.cancelButton} onPress={onClose}>
               <Text style={styles.cancelButtonText}>Cancel</Text>
             </Pressable>
             <Pressable style={styles.applyButton} onPress={handleApply}>
-              <Text style={styles.applyButtonText}>Apply</Text>
+              <Text style={styles.applyButtonText}>Apply Filters</Text>
             </Pressable>
           </View>
         </View>
@@ -96,7 +103,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContent: {
-    backgroundColor: "white",
+    backgroundColor: "#363B40",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     padding: 20,
@@ -109,80 +116,82 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     paddingBottom: 15,
     borderBottomWidth: 1,
-    borderBottomColor: "#eee",
+    borderBottomColor: "rgba(255, 255, 255, 0.2)",
   },
   modalTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#333",
-  },
-  closeButton: {
-    padding: 5,
+    fontFamily: "Lexend_Bold",
+    fontSize: 22,
+    color: "#fff",
   },
   section: {
     marginBottom: 25,
   },
   sectionTitle: {
+    fontFamily: "Lexend_Bold",
     fontSize: 18,
-    fontWeight: "600",
-    color: "#666",
+    color: "#fff",
     marginBottom: 15,
-  },
-  chipsContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 10,
   },
   chip: {
     marginRight: 8,
     marginBottom: 8,
-    backgroundColor: "#f5f5f5",
-    borderColor: "#4CAF50",
+    backgroundColor: "#4A5057",
+    borderColor: "#4A5057",
+    alignItems: "center",
+    width: 150,
+  },
+  chipContent: {
+    flexDirection: "row",
+    alignItems: "center",
   },
   selectedChip: {
-    backgroundColor: "#4CAF50",
-    borderColor: "#4CAF50",
+    backgroundColor: "#32BAE8",
+    borderColor: "#32BAE8",
   },
   chipText: {
-    color: "#4CAF50",
+    fontFamily: "Lexend_Regular",
+    color: "#aaa",
   },
   selectedChipText: {
+    fontFamily: "Lexend_Regular",
     color: "white",
   },
   chipIcon: {
-    marginRight: 5,
+    paddingRight: 5,
+    alignSelf: "center",
   },
   buttonContainer: {
     flexDirection: "row",
-    gap: 12,
     marginTop: "auto",
-    paddingTop: 20,
+    gap: 10,
   },
   cancelButton: {
-    flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    padding: 16,
+    padding: 10,
     borderRadius: 12,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#4A5057",
+    height: 40,
+    width: "25%",
   },
   cancelButtonText: {
-    color: "#666",
-    fontSize: 16,
-    fontWeight: "600",
+    fontFamily: "Lexend_Regular",
+    color: "#fff",
+    fontSize: 14,
   },
   applyButton: {
-    flex: 2,
     alignItems: "center",
     justifyContent: "center",
-    padding: 16,
+    padding: 10,
     borderRadius: 12,
-    backgroundColor: "#4CAF50",
+    backgroundColor: "#32BAE8",
+    height: 40,
+    width: "72%",
   },
   applyButtonText: {
+    fontFamily: "Lexend_Regular",
     color: "white",
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: 14,
   },
 });
 
