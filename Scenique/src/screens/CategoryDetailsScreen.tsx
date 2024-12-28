@@ -11,8 +11,13 @@ import {
 import { fetchWallpapers } from "../api/unsplash";
 
 const CategoryDetails = ({ route, navigation }: any) => {
-  // Get category and title from route params
   const { category, title } = route.params;
+  const [wallpapers, setWallpapers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   useEffect(() => {
     navigation.setOptions({
@@ -29,20 +34,16 @@ const CategoryDetails = ({ route, navigation }: any) => {
     });
   }, [navigation, title]);
 
-  const [wallpapers, setWallpapers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
-
   const loadWallpapers = async (pageNum = 1, refresh = false) => {
+    if (!hasMore && pageNum !== 1) return;
+
     try {
-      // Use the category title as the search query if query is not available
+      setIsLoadingMore(pageNum !== 1);
       const searchQuery = category.query || category.title;
       const newWallpapers = await fetchWallpapers({
         query: searchQuery,
         page: pageNum,
-        perPage: 10,
+        perPage: 20,
       });
 
       if (refresh) {
@@ -50,13 +51,13 @@ const CategoryDetails = ({ route, navigation }: any) => {
       } else {
         setWallpapers((prev) => [...prev, ...newWallpapers]);
       }
-
-      setHasMore(newWallpapers.length === 10); // Set to false if fewer than 10 items are fetched
+      setHasMore(newWallpapers.length === 20);
     } catch (error) {
       console.error(error);
     } finally {
       setLoading(false);
       setRefreshing(false);
+      setIsLoadingMore(false);
     }
   };
 
@@ -67,15 +68,25 @@ const CategoryDetails = ({ route, navigation }: any) => {
   const handleRefresh = () => {
     setRefreshing(true);
     setPage(1);
+    setHasMore(true);
     loadWallpapers(1, true);
   };
 
   const handleLoadMore = () => {
-    if (!loading && hasMore) {
+    if (!loading && !isLoadingMore && hasMore) {
       const nextPage = page + 1;
       setPage(nextPage);
       loadWallpapers(nextPage);
     }
+  };
+
+  const renderFooter = () => {
+    if (!isLoadingMore) return null;
+    return (
+      <View style={styles.footerLoader}>
+        <ActivityIndicator size="large" color="#32BAE8" />
+      </View>
+    );
   };
 
   const renderItem = ({ item }) => (
@@ -91,6 +102,14 @@ const CategoryDetails = ({ route, navigation }: any) => {
     </Pressable>
   );
 
+  if (loading && !refreshing) {
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" color="#32BAE8" />
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <FlatList
@@ -102,21 +121,15 @@ const CategoryDetails = ({ route, navigation }: any) => {
         onEndReached={handleLoadMore}
         onEndReachedThreshold={0.5}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            colors={["#32BAE8"]}
+          />
         }
-        ListFooterComponent={
-          hasMore && loading && !refreshing ? ( // Show only if fetching more
-            <ActivityIndicator
-              style={styles.loader}
-              size="large"
-              color="#fff"
-            />
-          ) : null
-        }
+        ListFooterComponent={renderFooter}
         showsVerticalScrollIndicator={false}
-        columnWrapperStyle={{
-          justifyContent: "space-between",
-        }}
+        columnWrapperStyle={styles.columnWrapper}
         key="flatlist-wallpapers-category"
       />
     </View>
@@ -136,6 +149,10 @@ const styles = StyleSheet.create({
     marginRight: 10,
     marginBottom: 10,
   },
+  columnWrapper: {
+    // justifyContent: "space-between",
+    // paddingHorizontal: 16,
+  },
   image: {
     width: "100%",
     height: 200,
@@ -150,7 +167,13 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     overflow: "hidden",
   },
-  loader: {
+  centered: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#363B40",
+  },
+  footerLoader: {
     padding: 16,
   },
 });
