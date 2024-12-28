@@ -1,15 +1,34 @@
-import React from "react";
-import { StyleSheet, TextInput, View } from "react-native";
+import React, { useState } from "react";
+import { StyleSheet, TextInput, View, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-const Search = () => {
+const Search = ({ onSearch, initialValue = "", onClear }) => {
+  const [query, setQuery] = useState(initialValue);
+
+  const handleSearch = () => {
+    onSearch(query);
+  };
+
+  const handleClear = () => {
+    setQuery("");
+    onClear();
+  };
+
   return (
     <View style={styles.input}>
       <Ionicons name="search" size={24} color="#363B40" />
       <TextInput
         style={styles.inputField}
         placeholder="Search anything . . ."
-      ></TextInput>
+        value={query}
+        onChangeText={setQuery}
+        onSubmitEditing={handleSearch}
+      />
+      {query ? (
+        <TouchableOpacity onPress={handleClear}>
+          <Ionicons name="close-circle" size={20} color="#363B40" />
+        </TouchableOpacity>
+      ) : null}
     </View>
   );
 };
