@@ -5,6 +5,7 @@ import RootNavigator from "./src/navigation/RootNavigator";
 import Toast from "react-native-toast-message";
 import { LikedImagesProvider } from "./src/context/LikedImagesContext";
 import { FilterProvider } from "./src/context/FiltersContext";
+import { AuthProvider } from "./src/context/AuthenticationContext";
 
 export default function App() {
   const [loaded] = useFonts({
@@ -22,13 +23,15 @@ export default function App() {
 
   return (
     <>
-      <FilterProvider>
-        <LikedImagesProvider>
-          <RootNavigator />
-          <Toast />
-          <StatusBar style="light" />
-        </LikedImagesProvider>
-      </FilterProvider>
+      <AuthProvider>
+        <FilterProvider>
+          <LikedImagesProvider>
+            <RootNavigator />
+            <Toast />
+            <StatusBar style="light" />
+          </LikedImagesProvider>
+        </FilterProvider>
+      </AuthProvider>
     </>
   );
 }
