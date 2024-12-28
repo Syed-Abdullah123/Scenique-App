@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const UNSPLASH_ACCESS_KEY = "T74aLY6AtwmyeraxmZy5IXqq4JFZgBLRDN4uH8wzA4M";
+export const UNSPLASH_ACCESS_KEY =
+  "T74aLY6AtwmyeraxmZy5IXqq4JFZgBLRDN4uH8wzA4M";
 const BASE_URL = "https://api.unsplash.com";
 
 export interface UnsplashPhoto {
@@ -25,6 +26,7 @@ interface FetchOptions {
   page?: number;
   perPage?: number;
   orderBy?: "latest" | "relevant" | "popular";
+  orientation?: "all" | "portrait" | "landscape" | "square";
 }
 
 // Fetch wallpapers with search
@@ -33,6 +35,7 @@ export const fetchWallpapers = async ({
   page = 1,
   perPage = 5,
   orderBy = "relevant",
+  orientation = "all",
 }: FetchOptions): Promise<UnsplashPhoto[]> => {
   try {
     const response = await axios.get(`${BASE_URL}/search/photos`, {
@@ -41,6 +44,7 @@ export const fetchWallpapers = async ({
         page,
         per_page: perPage,
         order_by: orderBy,
+        orientation: orientation !== "all" ? orientation : undefined,
       },
       headers: {
         Authorization: `Client-ID ${UNSPLASH_ACCESS_KEY}`,
