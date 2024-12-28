@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -14,45 +14,67 @@ import {
   useCategories,
 } from "../data/categories";
 import Search from "../components/SearhComponent";
+import { UnsplashPhoto } from "../api/unsplash";
 
 const SearchScreen = ({ navigation }: any) => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredCategories, setFilteredCategories] =
+    useState(WALLPAPER_CATEGORIES);
   const { categories, loading, error } = useCategories(WALLPAPER_CATEGORIES);
 
-  const renderItem = ({ item }: { item: Category }) => {
-    return (
-      <Pressable
-        style={styles.flatlistContainer}
-        onPress={() =>
-          navigation.navigate("Cat_Details", {
-            category: item,
-            title: item.title,
-          })
-        }
-      >
-        <View>
-          {item.coverImage ? (
-            <Image
-              source={{ uri: item.coverImage }}
-              style={styles.image}
-              defaultSource={require("../../assets/icons/icon.png")} // Add a placeholder image
-            />
-          ) : (
-            <View style={[styles.image, styles.placeholder]}>
-              <ActivityIndicator />
-            </View>
-          )}
-          <View style={styles.overlay}>
-            <Text style={styles.title}>{item.title}</Text>
-          </View>
-        </View>
-      </Pressable>
+  useEffect(() => {
+    // Update filteredCategories whenever categories are updated
+    setFilteredCategories(categories);
+  }, [categories]);
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    if (!query.trim()) {
+      setFilteredCategories(categories);
+      return;
+    }
+
+    const filtered = categories.filter(
+      (category) =>
+        category.title.toLowerCase().includes(query.toLowerCase()) ||
+        category.query.toLowerCase().includes(query.toLowerCase())
     );
+    setFilteredCategories(filtered);
   };
+
+  const renderItem = ({ item }: { item: Category }) => (
+    <Pressable
+      style={styles.flatlistContainer}
+      onPress={() =>
+        navigation.navigate("Cat_Details", {
+          category: item,
+          title: item.title,
+        })
+      }
+    >
+      <View>
+        {item.coverImage ? (
+          <Image
+            source={{ uri: item.coverImage }}
+            style={styles.image}
+            defaultSource={require("../../assets/icons/icon.png")} // Add a placeholder image
+          />
+        ) : (
+          <View style={[styles.image, styles.placeholder]}>
+            <ActivityIndicator />
+          </View>
+        )}
+        <View style={styles.overlay}>
+          <Text style={styles.title}>{item.title}</Text>
+        </View>
+      </View>
+    </Pressable>
+  );
 
   if (loading) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#fff" />
+        <ActivityIndicator size="large" color="#32BAE8" />
       </View>
     );
   }
@@ -67,15 +89,20 @@ const SearchScreen = ({ navigation }: any) => {
 
   return (
     <View style={styles.container}>
-      <Search />
+      <Search onSearch={handleSearch} />
       <FlatList
-        data={categories}
+        data={filteredCategories}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
         numColumns={2}
-        columnWrapperStyle={{ justifyContent: "space-between" }}
+        columnWrapperStyle={styles.columnWrapper}
         showsVerticalScrollIndicator={false}
-        key={"Search wallpapers"}
+        contentContainerStyle={styles.listContainer}
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>No categories found</Text>
+          </View>
+        }
       />
     </View>
   );
@@ -89,6 +116,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#363B40",
     paddingHorizontal: 15,
   },
+  columnWrapper: {
+    justifyContent: "space-between",
+  },
   flatlistContainer: {
     marginBottom: 10,
     borderRadius: 10,
@@ -96,6 +126,11 @@ const styles = StyleSheet.create({
     height: 85,
     width: 160,
     marginRight: 10,
+  },
+  cardContainer: {
+    borderRadius: 12,
+    overflow: "hidden",
+    backgroundColor: "#2A2D2F",
   },
   image: {
     height: "100%",
@@ -118,10 +153,6 @@ const styles = StyleSheet.create({
     color: "#fff",
     textAlign: "center",
   },
-  // gridContainer: {
-  //   padding: 16,
-  //   gap: 16,
-  // },
   placeholder: {
     backgroundColor: "#e0e0e0",
   },
@@ -136,5 +167,19 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     marginTop: 10,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingTop: 50,
+  },
+  emptyText: {
+    fontFamily: "CG_Regular",
+    color: "#FFFFFF",
+    fontSize: 16,
+  },
+  listContainer: {
+    paddingBottom: 16,
   },
 });
