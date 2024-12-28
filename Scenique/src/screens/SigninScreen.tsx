@@ -15,11 +15,13 @@ import ButtonComponent from "../components/ButtonComponent";
 
 import { FIREBASE_AUTH } from "../../firebaseConfig";
 import { signInWithEmailAndPassword } from "firebase/auth";
+import { useAuth } from "../context/AuthenticationContext";
 
 const Signin = ({ navigation }: any) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const { signIn } = useAuth();
 
   const handleSignin = async () => {
     if (!email.trim() || !email.includes("@")) {
@@ -52,8 +54,8 @@ const Signin = ({ navigation }: any) => {
         return;
       }
 
-      // Alert.alert("Login Successful", `Welcome back, ${user.email}!`);
-      navigation.navigate("Home"); // Navigate to home or dashboard
+      // Save token to context and AsyncStorage
+      await signIn(user.uid);
     } catch (error: any) {
       let errorMessage = "Something went wrong. Please try again.";
       if (error.code === "auth/user-not-found") {
@@ -83,21 +85,21 @@ const Signin = ({ navigation }: any) => {
         {/* Textinput containers section */}
         <View style={styles.inputs}>
           <View style={styles.inputContainer}>
-            <Ionicons name="mail-outline" size={20} color="#363B40" />
+            <Ionicons name="mail-outline" size={20} color="#363B4080" />
             <TextInput
               style={styles.input}
               placeholder="Enter your email"
-              placeholderTextColor="#363B40"
+              placeholderTextColor="#363B4080"
               value={email}
               onChangeText={setEmail}
             />
           </View>
           <View style={styles.inputContainer}>
-            <Ionicons name="lock-closed-outline" size={20} color="#363B40" />
+            <Ionicons name="lock-closed-outline" size={20} color="#363B4080" />
             <TextInput
               style={styles.input}
               placeholder="Enter you password"
-              placeholderTextColor="#363B40"
+              placeholderTextColor="#363B4080"
               value={password}
               onChangeText={setPassword}
               secureTextEntry={true}
@@ -173,7 +175,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginBottom: 15,
     paddingHorizontal: 10,
-    paddingVertical: 3,
+    paddingVertical: 5,
     gap: 10,
   },
   input: {
