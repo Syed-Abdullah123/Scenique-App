@@ -306,7 +306,7 @@ const DashboardScreen = ({ navigation }) => {
 
       {loading ? (
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color="#fff" />
+          <ActivityIndicator size="large" color="#32BAE8" />
         </View>
       ) : searchResults.length > 0 ? (
         renderSearchResults()
