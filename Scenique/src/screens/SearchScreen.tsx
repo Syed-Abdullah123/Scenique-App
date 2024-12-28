@@ -7,6 +7,7 @@ import {
   FlatList,
   Pressable,
   ActivityIndicator,
+  BackHandler,
 } from "react-native";
 import {
   WALLPAPER_CATEGORIES,
@@ -26,6 +27,40 @@ const SearchScreen = ({ navigation }: any) => {
     // Update filteredCategories whenever categories are updated
     setFilteredCategories(categories);
   }, [categories]);
+
+  // Handle hardware back button
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      () => {
+        if (searchQuery) {
+          clearSearch();
+          return true; // Prevent default back behavior
+        }
+        return false; // Let default back behavior happen
+      }
+    );
+
+    return () => backHandler.remove();
+  }, [searchQuery]);
+
+  // Add navigation listener for the back button
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("beforeRemove", (e) => {
+      if (searchQuery) {
+        // Prevent default behavior
+        e.preventDefault();
+        clearSearch();
+      }
+    });
+
+    return unsubscribe;
+  }, [navigation, searchQuery]);
+
+  const clearSearch = () => {
+    setSearchQuery("");
+    setFilteredCategories(categories);
+  };
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
@@ -89,7 +124,11 @@ const SearchScreen = ({ navigation }: any) => {
 
   return (
     <View style={styles.container}>
-      <Search onSearch={handleSearch} />
+      <Search
+        onSearch={handleSearch}
+        initialValue={searchQuery}
+        onClear={clearSearch}
+      />
       <FlatList
         data={filteredCategories}
         renderItem={renderItem}
