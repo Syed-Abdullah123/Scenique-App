@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   StyleSheet,
   Text,
@@ -8,26 +8,79 @@ import {
   TouchableOpacity,
   Pressable,
   ActivityIndicator,
+  BackHandler,
 } from "react-native";
-import { UnsplashPhoto, fetchRandomWallpapers } from "../api/unsplash";
+import {
+  UnsplashPhoto,
+  fetchRandomWallpapers,
+  fetchWallpapers,
+} from "../api/unsplash";
 import { WALLPAPER_CATEGORIES, useCategories } from "../data/categories";
+import { FilterContext } from "../context/FiltersContext";
+
 import Search from "../components/SearhComponent";
+import Filter from "../components/FilterComponent";
+import { Ionicons } from "@expo/vector-icons";
 
 const DashboardScreen = ({ navigation }) => {
   const [bestOfMonth, setBestOfMonth] = useState<UnsplashPhoto[]>([]);
+  const [searchResults, setSearchResults] = useState<UnsplashPhoto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showFilter, setShowFilter] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [page, setPage] = useState(1);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
 
   // Get first 6 categories for dashboard
+  const { filter, setFilter } = useContext(FilterContext);
   const dashboardCategories = WALLPAPER_CATEGORIES.slice(0, 6);
   const { categories } = useCategories(dashboardCategories);
+
+  // Handle hardware back button
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      () => {
+        if (searchResults.length > 0) {
+          clearSearch();
+          return true; // Prevent default back behavior
+        }
+        return false; // Let default back behavior happen
+      }
+    );
+
+    return () => backHandler.remove();
+  }, [searchResults]);
+
+  // Add navigation listener for the back button
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("beforeRemove", (e) => {
+      if (searchResults.length > 0) {
+        // Prevent default behavior
+        e.preventDefault();
+        clearSearch();
+      }
+    });
+
+    return unsubscribe;
+  }, [navigation, searchResults]);
+
+  const clearSearch = () => {
+    setSearchQuery("");
+    setSearchResults([]);
+    setPage(1);
+    setHasMore(true);
+  };
 
   useEffect(() => {
     const loadData = async () => {
       try {
         setLoading(true);
-        const randomWallpapers = await fetchRandomWallpapers(10);
+        const randomWallpapers = await fetchRandomWallpapers(8);
         setBestOfMonth(randomWallpapers);
+        setSearchResults([]); // Clear search results when loading initial data
       } catch (err) {
         setError("Failed to load wallpapers. Please try again later.");
       } finally {
@@ -37,6 +90,71 @@ const DashboardScreen = ({ navigation }) => {
 
     loadData();
   }, []);
+
+  // Handle search functionality
+  const handleSearch = async (query: string) => {
+    setSearchQuery(query);
+    if (!query.trim()) {
+      setSearchResults([]);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const results = await fetchWallpapers({
+        query,
+        orientation: filter.orientation,
+        page: 1,
+        perPage: 16,
+      });
+      setSearchResults(results);
+      setPage(1);
+      setHasMore(results.length === 16);
+    } catch (err) {
+      console.error("Error fetching search results:", err);
+      setError("Failed to fetch search results. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadMoreResults = async () => {
+    if (isLoadingMore || !hasMore || !searchQuery) return;
+
+    setIsLoadingMore(true);
+    try {
+      const nextPage = page + 1;
+      const moreResults = await fetchWallpapers({
+        query: searchQuery,
+        orientation: filter.orientation,
+        page: nextPage,
+        perPage: 16,
+      });
+
+      if (moreResults.length > 0) {
+        setSearchResults((prev) => [...prev, ...moreResults]);
+        setPage(nextPage);
+        setHasMore(moreResults.length === 30);
+      } else {
+        setHasMore(false);
+      }
+    } catch (err) {
+      console.error("Error loading more results:", err);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  };
+
+  // Handle filter changes
+  const handleFilterApply = (newFilter) => {
+    setFilter(newFilter);
+    setShowFilter(false);
+
+    // If there's an active search, re-run it with new filters
+    if (searchResults.length > 0) {
+      handleSearch(searchResults[0]?.description || "");
+    }
+  };
 
   const sections = [
     {
@@ -64,7 +182,6 @@ const DashboardScreen = ({ navigation }) => {
         </Pressable>
       );
     } else {
-      // Categories section
       return (
         <Pressable
           style={styles.categoriesContainer}
@@ -101,14 +218,6 @@ const DashboardScreen = ({ navigation }) => {
     );
   };
 
-  if (loading) {
-    return (
-      <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#fff" />
-      </View>
-    );
-  }
-
   if (error) {
     return (
       <View style={styles.centered}>
@@ -120,27 +229,90 @@ const DashboardScreen = ({ navigation }) => {
     );
   }
 
+  const renderSearchResults = () => (
+    <FlatList
+      key="search"
+      data={searchResults}
+      renderItem={({ item }) => (
+        <Pressable
+          style={styles.searchResultContainer}
+          onPress={() => navigation.navigate("Details", { item })}
+        >
+          <Image
+            source={{ uri: item.urls.regular }}
+            style={styles.searchResultImage}
+          />
+        </Pressable>
+      )}
+      keyExtractor={(item) => item.id}
+      numColumns={2}
+      columnWrapperStyle={styles.searchResultsColumns}
+      onEndReached={loadMoreResults}
+      onEndReachedThreshold={0.5}
+      ListFooterComponent={
+        isLoadingMore ? <ActivityIndicator style={{ padding: 20 }} /> : null
+      }
+      showsVerticalScrollIndicator={false}
+    />
+  );
+
+  const renderDashboard = () => (
+    <FlatList
+      key="dashboard"
+      data={sections}
+      renderItem={({ item: section }) => (
+        <View>
+          {renderSectionHeader({ section })}
+          <FlatList
+            data={section.data}
+            renderItem={({ item }) => renderItem({ item, section })}
+            keyExtractor={(item) => item.id}
+            horizontal={section.horizontal}
+            showsHorizontalScrollIndicator={false}
+            numColumns={section.numColumns}
+          />
+        </View>
+      )}
+      keyExtractor={(section, index) => index.toString()}
+      showsVerticalScrollIndicator={false}
+    />
+  );
+
   return (
     <View style={styles.container}>
-      <Search />
-      <FlatList
-        data={sections}
-        renderItem={({ item: section }) => (
-          <View>
-            {renderSectionHeader({ section })}
-            <FlatList
-              data={section.data}
-              renderItem={({ item }) => renderItem({ item, section })}
-              keyExtractor={(item) => item.id}
-              horizontal={section.horizontal}
-              showsHorizontalScrollIndicator={false}
-              numColumns={section.numColumns}
-            />
-          </View>
-        )}
-        keyExtractor={(section, index) => index.toString()}
-        showsVerticalScrollIndicator={false}
+      <View style={styles.header}>
+        <View style={{ width: "90%" }}>
+          <Search
+            onSearch={handleSearch}
+            initialValue={searchQuery}
+            onClear={clearSearch}
+          />
+        </View>
+        <TouchableOpacity
+          style={styles.filterContainer}
+          onPress={() => setShowFilter(true)}
+        >
+          <Ionicons name="filter-sharp" size={24} color="#32BAE8" />
+        </TouchableOpacity>
+      </View>
+
+      {/* Filter Modal */}
+      <Filter
+        visible={showFilter}
+        onClose={() => setShowFilter(false)}
+        onApply={handleFilterApply}
+        initialValues={filter}
       />
+
+      {loading ? (
+        <View style={styles.centered}>
+          <ActivityIndicator size="large" color="#fff" />
+        </View>
+      ) : searchResults.length > 0 ? (
+        renderSearchResults()
+      ) : (
+        renderDashboard()
+      )}
     </View>
   );
 };
@@ -152,7 +324,22 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 15,
     backgroundColor: "#363B40",
-    // paddingVertical: 10,
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
+    paddingLeft: 0,
+    alignItems: "center",
+  },
+  filterContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#4A5057",
+    width: 40,
+    height: 40,
+    borderRadius: 10,
+    marginLeft: 10,
   },
   flatlistContainer: {
     marginBottom: 10,
@@ -229,5 +416,20 @@ const styles = StyleSheet.create({
     color: "#32BAE8",
     fontSize: 12,
     textDecorationLine: "underline",
+  },
+  searchResultContainer: {
+    flex: 1,
+    margin: 5,
+    height: 200,
+    borderRadius: 10,
+    overflow: "hidden",
+  },
+  searchResultImage: {
+    width: "100%",
+    height: "100%",
+  },
+  searchResultsColumns: {
+    justifyContent: "space-between",
+    paddingHorizontal: 5,
   },
 });
