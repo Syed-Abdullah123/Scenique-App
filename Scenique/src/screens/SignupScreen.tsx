@@ -19,6 +19,7 @@ import {
   createUserWithEmailAndPassword,
   sendEmailVerification,
 } from "firebase/auth";
+import { useAuth } from "../context/AuthenticationContext";
 
 const Signup = ({ navigation }: any) => {
   const [username, setUsername] = useState("");
@@ -26,6 +27,7 @@ const Signup = ({ navigation }: any) => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const { signIn } = useAuth();
 
   // Function to handle signup
   const handleSignup = async () => {
@@ -76,8 +78,8 @@ const Signup = ({ navigation }: any) => {
         "A verification email has been sent to your email address. Please verify your email to log in."
       );
 
-      // Alert.alert("Signup Successful", `Welcome, ${username}!`);
-      navigation.navigate("Signin"); // Navigate to Signin screen after successful signup
+      // Save token to context and AsyncStorage
+      await signIn(user.uid);
     } catch (error: any) {
       // Handle common Firebase auth errors
       let errorMessage = "Something went wrong. Please try again.";
@@ -111,42 +113,42 @@ const Signup = ({ navigation }: any) => {
         {/* Textinput containers section */}
         <View style={styles.inputs}>
           <View style={styles.inputContainer}>
-            <Ionicons name="person-outline" size={20} color="#363B40" />
+            <Ionicons name="person-outline" size={20} color="#363B4080" />
             <TextInput
               style={styles.input}
               placeholder="Enter username"
-              placeholderTextColor="#363B40"
+              placeholderTextColor="#363B4080"
               value={username}
               onChangeText={setUsername}
             />
           </View>
           <View style={styles.inputContainer}>
-            <Ionicons name="mail-outline" size={20} color="#363B40" />
+            <Ionicons name="mail-outline" size={20} color="#363B4080" />
             <TextInput
               style={styles.input}
               placeholder="Enter your email"
-              placeholderTextColor="#363B40"
+              placeholderTextColor="#363B4080"
               value={email}
               onChangeText={setEmail}
             />
           </View>
           <View style={styles.inputContainer}>
-            <Ionicons name="lock-closed-outline" size={20} color="#363B40" />
+            <Ionicons name="lock-closed-outline" size={20} color="#363B4080" />
             <TextInput
               style={styles.input}
               placeholder="Enter you password"
-              placeholderTextColor="#363B40"
+              placeholderTextColor="#363B4080"
               value={password}
               onChangeText={setPassword}
               secureTextEntry={true}
             />
           </View>
           <View style={styles.inputContainer}>
-            <Ionicons name="lock-closed-outline" size={20} color="#363B40" />
+            <Ionicons name="lock-closed-outline" size={20} color="#363B4080" />
             <TextInput
               style={styles.input}
               placeholder="Confirm password"
-              placeholderTextColor="#363B40"
+              placeholderTextColor="#363B4080"
               value={confirmPassword}
               onChangeText={setConfirmPassword}
               secureTextEntry={true}
@@ -223,7 +225,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginBottom: 15,
     paddingHorizontal: 10,
-    paddingVertical: 3,
+    paddingVertical: 5,
     gap: 10,
   },
   input: {
