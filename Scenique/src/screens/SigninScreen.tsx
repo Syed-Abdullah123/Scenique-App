@@ -92,6 +92,8 @@ const Signin = ({ navigation }: any) => {
               placeholderTextColor="#363B4080"
               value={email}
               onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
             />
           </View>
           <View style={styles.inputContainer}>
@@ -175,23 +177,23 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginBottom: 15,
     paddingHorizontal: 10,
-    paddingVertical: 5,
+    paddingVertical: 3,
     gap: 10,
   },
   input: {
     flex: 1,
-    fontFamily: "CG_Regular",
+    fontFamily: "Lexend_Regular",
     color: "#363B40",
   },
   buttonContainer: {
     marginTop: 20,
   },
   forgotText: {
-    width: 120,
+    width: 130,
     alignSelf: "flex-end",
   },
   signinText: {
-    fontFamily: "CG_Medium",
+    fontFamily: "Lexend_Medium",
     fontSize: 14,
     color: "#32BAE8",
     marginTop: 10,
