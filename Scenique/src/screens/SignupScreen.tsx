@@ -78,8 +78,7 @@ const Signup = ({ navigation }: any) => {
         "A verification email has been sent to your email address. Please verify your email to log in."
       );
 
-      // Save token to context and AsyncStorage
-      await signIn(user.uid);
+      navigation.navigate("Signin");
     } catch (error: any) {
       // Handle common Firebase auth errors
       let errorMessage = "Something went wrong. Please try again.";
@@ -130,6 +129,8 @@ const Signup = ({ navigation }: any) => {
               placeholderTextColor="#363B4080"
               value={email}
               onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
             />
           </View>
           <View style={styles.inputContainer}>
@@ -225,19 +226,19 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginBottom: 15,
     paddingHorizontal: 10,
-    paddingVertical: 5,
+    paddingVertical: 3,
     gap: 10,
   },
   input: {
     flex: 1,
-    fontFamily: "CG_Regular",
+    fontFamily: "Lexend_Regular",
     color: "#363B40",
   },
   buttonContainer: {
     marginTop: 20,
   },
   signinText: {
-    fontFamily: "CG_Regular",
+    fontFamily: "Lexend_Regular",
     fontSize: 14,
     color: "#c0c0c0",
     marginTop: 5,
