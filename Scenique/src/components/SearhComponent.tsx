@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
   },
   inputField: {
     flex: 1,
-    fontFamily: "CG_Regular",
+    fontFamily: "Lexend_Regular",
     color: "#363B40",
   },
 });
