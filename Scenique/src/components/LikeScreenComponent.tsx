@@ -38,9 +38,15 @@ const LikeScreenComponent = ({ navigation }: any) => {
   return (
     <View style={styles.container}>
       {likedImages.length === 0 ? (
-        <Text style={styles.emptyText}>
-          No wallpapers liked yet. Start liking wallpapers to see them here!
-        </Text>
+        <View style={styles.emptyContainer}>
+          <Image
+            source={require("../../assets/icons/sad.png")}
+            style={styles.placeholderImage}
+          />
+          <Text style={styles.emptyText}>
+            No wallpapers liked yet. Start liking wallpapers to see them here!
+          </Text>
+        </View>
       ) : (
         <FlatList
           data={likedImages}
@@ -61,6 +67,15 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 10,
   },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  placeholderImage: {
+    width: 200,
+    height: 200,
+  },
   itemContainer: {
     width: "48%",
     marginRight: 10,
@@ -73,7 +88,7 @@ const styles = StyleSheet.create({
     resizeMode: "cover",
   },
   emptyText: {
-    fontFamily: "CG_Regular",
+    fontFamily: "Lexend_Regular",
     color: "#fff",
     fontSize: 16,
     textAlign: "center",
