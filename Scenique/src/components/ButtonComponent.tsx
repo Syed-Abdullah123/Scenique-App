@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: "#32BAE8",
     padding: 12,
-    borderRadius: 5,
+    borderRadius: 30,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#363B40",
     fontSize: 16,
-    fontFamily: "CG_Medium",
+    fontFamily: "Lexend_Medium",
   },
   disabledButton: {
     backgroundColor: "#32BAE8",
