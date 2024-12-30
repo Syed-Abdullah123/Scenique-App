@@ -8,6 +8,7 @@ import {
   Image,
   Animated,
   Platform,
+  Linking,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { BlurView } from "expo-blur";
@@ -117,6 +118,19 @@ const Welcome = ({ navigation }) => {
             </LinearGradient>
           </TouchableOpacity>
         </View>
+
+        {/* Unsplash Attribution */}
+        <View style={styles.attributionContainer}>
+          <Text style={styles.attributionText}>
+            Wallpapers provided by{" "}
+            <Text
+              style={styles.attributionLink}
+              onPress={() => Linking.openURL("https://unsplash.com")}
+            >
+              Unsplash
+            </Text>
+          </Text>
+        </View>
       </LinearGradient>
     </View>
   );
@@ -210,5 +224,19 @@ const styles = StyleSheet.create({
     fontFamily: "Lexend_Bold",
     color: "#fff",
     fontSize: 18,
+  },
+  attributionContainer: {
+    marginBottom: 30,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  attributionText: {
+    fontFamily: "Lexend_Regular",
+    fontSize: 12,
+    color: "#ffffff60",
+  },
+  attributionLink: {
+    color: "#32BAE8",
+    textDecorationLine: "underline",
   },
 });
