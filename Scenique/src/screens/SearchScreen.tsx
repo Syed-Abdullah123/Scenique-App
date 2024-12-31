@@ -15,7 +15,6 @@ import {
   useCategories,
 } from "../data/categories";
 import Search from "../components/SearhComponent";
-import { UnsplashPhoto } from "../api/unsplash";
 
 const SearchScreen = ({ navigation }: any) => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -92,7 +91,7 @@ const SearchScreen = ({ navigation }: any) => {
           <Image
             source={{ uri: item.coverImage }}
             style={styles.image}
-            defaultSource={require("../../assets/icons/icon.png")} // Add a placeholder image
+            defaultSource={require("../../assets/icons/Placeholder.png")} // Add a placeholder image
           />
         ) : (
           <View style={[styles.image, styles.placeholder]}>
@@ -163,7 +162,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     overflow: "hidden",
     height: 85,
-    width: 160,
+    width: "48%",
     marginRight: 10,
   },
   cardContainer: {
