@@ -19,11 +19,19 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/icons/icon.png",
         "backgroundColor": "#363B40"
-      }
+      },
+      "package": "com.abc_123_a.Scenique"
     },
     "web": {
       "favicon": "./assets/icons/favicon.png"
     },
-    "plugins": ["expo-font"]
+    "plugins": [
+      "expo-font"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "c5aeea8b-6bb2-4b70-8574-5964ade56b4a"
+      }
+    }
   }
 }
