@@ -97,7 +97,7 @@ const CategoryDetails = ({ route, navigation }: any) => {
       <Image
         source={{ uri: item.urls.regular }}
         style={styles.image}
-        defaultSource={require("../../assets/icons/icon.png")}
+        defaultSource={require("../../assets/icons/Placeholder.png")}
       />
     </Pressable>
   );
