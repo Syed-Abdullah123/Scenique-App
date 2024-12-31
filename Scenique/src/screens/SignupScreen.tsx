@@ -137,7 +137,7 @@ const Signup = ({ navigation }: any) => {
             <Ionicons name="lock-closed-outline" size={20} color="#363B4080" />
             <TextInput
               style={styles.input}
-              placeholder="Enter you password"
+              placeholder="Enter your password"
               placeholderTextColor="#363B4080"
               value={password}
               onChangeText={setPassword}
@@ -220,14 +220,15 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   inputContainer: {
+    height: 40,
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#e0e0e0",
+    width: "100%",
     borderRadius: 5,
     marginBottom: 15,
-    paddingHorizontal: 10,
-    paddingVertical: 3,
-    gap: 10,
+    paddingHorizontal: 12,
+    gap: 6,
   },
   input: {
     flex: 1,

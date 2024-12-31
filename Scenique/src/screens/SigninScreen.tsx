@@ -171,14 +171,15 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   inputContainer: {
+    height: 40,
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#e0e0e0",
+    width: "100%",
     borderRadius: 5,
     marginBottom: 15,
-    paddingHorizontal: 10,
-    paddingVertical: 3,
-    gap: 10,
+    paddingHorizontal: 12,
+    gap: 6,
   },
   input: {
     flex: 1,
@@ -189,7 +190,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   forgotText: {
-    width: 130,
+    width: "50%",
     alignSelf: "flex-end",
   },
   signinText: {
