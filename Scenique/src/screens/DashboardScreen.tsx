@@ -178,7 +178,11 @@ const DashboardScreen = ({ navigation }) => {
           style={styles.flatlistContainer}
           onPress={() => navigation.navigate("Details", { item })}
         >
-          <Image source={{ uri: item.urls.regular }} style={styles.image} />
+          <Image
+            source={{ uri: item.urls.regular }}
+            style={styles.image}
+            defaultSource={require("../../assets/icons/Placeholder.png")}
+          />
         </Pressable>
       );
     } else {
@@ -195,7 +199,7 @@ const DashboardScreen = ({ navigation }) => {
           <Image
             source={{ uri: item.coverImage }}
             style={styles.categoryImage}
-            defaultSource={require("../../assets/icons/icon.png")}
+            defaultSource={require("../../assets/icons/Placeholder.png")}
           />
           <View style={styles.overlay}>
             <Text style={styles.title}>{item.title}</Text>
@@ -370,7 +374,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     overflow: "hidden",
     height: 85,
-    width: 160,
+    width: "48%",
     marginRight: 10,
   },
   categoryImage: {
