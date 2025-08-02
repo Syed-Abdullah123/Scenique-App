@@ -75,7 +75,7 @@ const Signup = ({ navigation }: any) => {
 
       Alert.alert(
         "Signup Successful",
-        "A verification email has been sent to your email address. Please verify your email to log in."
+        "We've sent a verification email to your address. Please check your inbox and spam folder to verify your email before logging in."
       );
 
       navigation.navigate("Signin");
